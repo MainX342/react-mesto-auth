@@ -32,10 +32,6 @@ function App() {
     setIsEditAvatarPopupOpen(true)
   }
 
-  // function handleDeletePlaceClick() {
-
-  // }
-
   function handleImageClick(card) {
     setSelectedCard(card)
     setIsImagePopupOpen(true)

@@ -14,7 +14,6 @@ export default function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardCl
         setUserName(userData.name);
         setUseDescription(userData.about);
         setUserAvatar(userData.avatar);
-        // cardData.forEach(card => card.myid = userData._id);
         setCards(cardData);
       })
       .catch((error) => {
