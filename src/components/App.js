@@ -96,9 +96,7 @@ function App() {
         title='Вы уверены?'
         titleButton='Да'
         />
-      <ImagePopup card={selectedCard} isOpen={isImagePopupOpen} onClose={closeAllPopups}>
-
-      </ImagePopup>
+      <ImagePopup card={selectedCard} isOpen={isImagePopupOpen} onClose={closeAllPopups}/>
     </div>
   );
 }

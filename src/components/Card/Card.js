@@ -6,7 +6,7 @@ export default function Card({ card, onCardClick }) {
       <div className="elements__description">
         <h2 className="elements__title">{card.name}</h2>
         <button className="elements__like" type="button" />
-        <span className="elements__like-counter" />
+        <span className="elements__like-counter">{card.likes.length}</span>
       </div>
     </li>
   )

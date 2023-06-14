@@ -10,11 +10,11 @@ export default function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardCl
 
   useEffect(() => {
     Promise.all([api.getInfo(), api.getInitialCards()])
-      .then(([userData, cardData]) => {
-        setUserName(userData.name);
-        setUseDescription(userData.about);
-        setUserAvatar(userData.avatar);
-        setCards(cardData);
+      .then(([user, cards]) => {
+        setUserName(user.name);
+        setUseDescription(user.about);
+        setUserAvatar(user.avatar);
+        setCards(cards);
       })
       .catch((error) => {
         console.error('Ошибка при создании начальных данных', error);
