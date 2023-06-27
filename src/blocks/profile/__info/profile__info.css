@@ -2,9 +2,9 @@
   padding: 0;
   margin: 0 auto 0 0;
   display: grid;
-  grid-template-columns: 294px 24px;
+  grid-template-columns: 1fr 24px;
   gap: 16px 18px;
-  align-items: end;
+  align-items: center;
 }
 
 @media screen and (max-width: 680px) {
