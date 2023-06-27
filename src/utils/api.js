@@ -72,25 +72,38 @@ class Api {
     return this._checkResponse(res);
   }
 
-  async addLike(cardId) {
-    const res = await fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-      method: 'PUT',
-      headers: {
-        authorization: this._authorization
-      }
-    });
-    return this._checkResponse(res);
+  async changeLikeCardStatus(cardId, isLiked) {
+    let method= 'DELETE';
+    if (isLiked) {
+      method = 'PUT';
+    }
+    return await fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+      method: method,
+      headers: this._headers
+    })
+    .then(this._checkResponse);
   }
 
-  async deleteLike(cardId) {
-    const res = await fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-      method: 'DELETE',
-      headers: {
-        authorization: this._authorization
-      }
-    });
-    return this._checkResponse(res);
-  }
+
+  // async addLike(cardId) {
+  //   const res = await fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       authorization: this._authorization
+  //     }
+  //   });
+  //   return this._checkResponse(res);
+  // }
+
+  // async deleteLike(cardId) {
+  //   const res = await fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+  //     method: 'DELETE',
+  //     headers: {
+  //       authorization: this._authorization
+  //     }
+  //   });
+  //   return this._checkResponse(res);
+  // }
 }
 
 // Экземпляр класса API

@@ -149,6 +149,13 @@ function App() {
       .finally(() => setIsSending(false));
   }
 
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+    });
+}
+
   useEffect(() => {
     setIsLoading(true);
     Promise.all([api.getInfo(), api.getInitialCards()])
@@ -173,6 +180,7 @@ function App() {
             onEditAvatar={handleEditAvatarClick}
             onCardClick={handleImageClick}
             onDeleteCard={handleDeleteCardClick}
+            onCardLike={handleCardLike}
             cards={cards}
             isLoading={isLoading}
           />

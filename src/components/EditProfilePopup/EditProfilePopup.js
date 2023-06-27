@@ -12,12 +12,10 @@ export default function EditProfilePopup({ isOpen, onClose, isSending, onUpdateU
       setValue('username', currentUser.name)
       setValue('description', currentUser.about)
     }
-  },[currentUser, setValue])
-
-  function resetFormOnClose () {
-    onClose()
-    resetForm({ username: currentUser.name, description: currentUser.about })
-  }
+    else {
+      isOpen && resetForm({ username: currentUser.name, description: currentUser.about })
+    }
+  },[currentUser, setValue, isOpen, resetForm])
 
   function handleSubmit(evt) {
     evt.preventDefault();
@@ -30,7 +28,7 @@ export default function EditProfilePopup({ isOpen, onClose, isSending, onUpdateU
       title="Редактировать профиль"
       sendingText="Сохранение..."
       isOpen={isOpen}
-      onClose={resetFormOnClose}
+      onClose={onClose}
       isSending={isSending}
       isValid={isValid}
       onSubmit={handleSubmit}
