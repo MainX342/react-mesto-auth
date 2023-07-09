@@ -14,9 +14,9 @@
   }
 }
 
-@media screen and (max-width: 400px) {
+/* @media screen and (max-width: 400px) {
   .profile__info {
-    grid-template-columns: 189px 18px;
+    grid-template-columns: 1fr 18px;
   }
 }
 
@@ -24,4 +24,4 @@
   .profile__info {
     margin: 0 auto 30px 65px;
   }
-}
+} */

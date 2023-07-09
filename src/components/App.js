@@ -9,8 +9,15 @@ import api from "../utils/api.js";
 import EditProfilePopup from "./EditProfilePopup/EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup/EditAvatarPopup.js";
 import AddPlacePopup from "./AddPlacePopup/AddPlacePopup.js";
+import { Navigate, useNavigate, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.js";
+import ProtectedPages from "./ProtectedPages/ProtectedPages.js";
+import { getUserData, authorization, registration } from '../utils/auth.js'
+import SendContext from "../contexts/SendContext.js";
+import InfoTooltip from "./InfoTooltip/InfoTooltip.js";
 
 function App() {
+  const navigate = useNavigate()
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -21,10 +28,44 @@ function App() {
   const [isSending, setIsSending] = useState(false);
 
   const [currentUser, setCurrentUser] = useState({});
+  const [dataUser, setDataUser] = useState('')
 
   const [cards, setCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [cardIdForDelete, setCardIdForDelete] = useState("");
+
+  const [isSuccessful, setIsSuccessful] = useState(false)
+  const [isError, setIsError] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  useEffect(() => {
+    if (localStorage.jwt) {
+      getUserData(localStorage.jwt)
+        .then(res => {
+          setDataUser(res.data.email)
+          setLoggedIn(true)
+          navigate('/')
+        })
+        .catch((error) => {
+          console.log(`Ошибка авторизации при повторном входе ${error}`)
+    })
+  }
+  }, [navigate])
+
+  useEffect(() => {
+    if (loggedIn) {
+      setIsLoading(true)
+      Promise.all([api.getInfo(), api.getInitialCards()])
+        .then(([user, cards]) => {
+          setCurrentUser(user)
+          setCards(cards)
+          setIsLoading(false)
+        })
+        .catch((error) => {
+          console.error(`Ошибка при создании начальных данных ${error}`);
+        });
+    }
+  }, [loggedIn])
 
   const setStatesForPopups = useCallback(() => {
     setIsEditProfilePopupOpen(false);
@@ -33,6 +74,8 @@ function App() {
     setIsImagePopupOpen(false);
     setIsDeleteCardPopupOpen(false);
     setIsPopupOpen(false);
+    setIsSuccessful(false)
+    setIsError(false)
   }, []);
 
   const handleEscKey = useCallback(
@@ -45,7 +88,7 @@ function App() {
   );
 
   useEffect(() => {
-    if (isPopupOpen) {
+    if (isPopupOpen || isSuccessful || isError) {
       document.addEventListener("keydown", handleEscKey);
     } else {
       document.removeEventListener("keydown", handleEscKey);
@@ -53,7 +96,7 @@ function App() {
     return () => {
       document.removeEventListener("keydown", handleEscKey);
     };
-  }, [isPopupOpen, handleEscKey]);
+  }, [isPopupOpen, isSuccessful, isError, handleEscKey]);
 
   const closeAllPopups = useCallback(() => {
     setStatesForPopups();
@@ -154,28 +197,50 @@ function App() {
     api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
     })
-    .catch((error) => {"Ошибка при изменении статуса лайка", error});
+    .catch((error) => {
+      console.error(`Ошибка при изменении статуса лайка ${error}`);
+    })
   };
 
-  useEffect(() => {
-    setIsLoading(true);
-    Promise.all([api.getInfo(), api.getInitialCards()])
-      .then(([user, cards]) => {
-        setCurrentUser(user);
-        setCards(cards);
-        setIsLoading(false);
+  function handleLogin(password, email) {
+    setIsSending(true)
+    authorization(password, email)
+      .then(res => {
+        localStorage.setItem('jwt', res.token)
+        setLoggedIn(true)
+        window.scrollTo(0, 0)
+        navigate('/')
+      })
+      .catch(error => {
+        setIsError(true)
+        console.error(`Ошибка при авторизации ${error}`)
+      })
+      .finally(() => setIsSending(false))
+  }
+
+  function handleRegister(password, email) {
+    setIsSending(true)
+    registration(password, email)
+      .then((res) => {
+        setIsSuccessful(true)
+        window.scrollTo(0, 0)
+        navigate('/sign-in')
       })
       .catch((error) => {
-        console.error("Ошибка при создании начальных данных", error);
-      });
-  }, []);
+        setIsError(true)
+        console.error(`Ошибка при регистрации ${error}`)
+      })
+      .finally(() => setIsSending(false))
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <div>
         <div className="page__container">
-          <Header />
-          <Main
+        <SendContext.Provider value={isSending}>
+        <Routes>
+          <Route path='/' element={<ProtectedRoute
+            element={ProtectedPages}
+            dataUser={dataUser}
             onEditProfile={handleEditProfileClick}
             onAddPlace={handleAddPlaceClick}
             onEditAvatar={handleEditAvatarClick}
@@ -184,9 +249,26 @@ function App() {
             onCardLike={handleCardLike}
             cards={cards}
             isLoading={isLoading}
-          />
+            loggedIn={loggedIn} />
+          } />
+          <Route path='/sign-up' element={
+              <>
+                <Header name='signup' />
+                <Main name='signup' handleRegister={handleRegister} />
+              </>
+            } />
+            <Route path='/sign-in' element={
+              <>
+                <Header name='signin' />
+                <Main name='signin' handleLogin={handleLogin} />
+              </>
+            } />
+            <Route path='*' element={<Navigate to='/' />} />
+          </Routes>
           <Footer />
-        </div>
+          </SendContext.Provider>
+
+        <SendContext.Provider value={isSending}>
         <EditProfilePopup
           onUpdateUser={handleUpdateUser}
           isOpen={isEditProfilePopupOpen}
@@ -215,11 +297,28 @@ function App() {
           onSubmit={handleSubmitForDeleteCard}
           isSending={isSending}
         />
+        </SendContext.Provider>
+
         <ImagePopup
           card={selectedCard}
           isOpen={isImagePopupOpen}
           onClose={closeAllPopups}
         />
+
+        <InfoTooltip
+          name='successful'
+          titleText={'Вы успешно зарегистрировались!'}
+          isOpen={isSuccessful}
+          onClose={closeAllPopups}
+        />
+
+        <InfoTooltip
+          name='error'
+          titleText={'Что-то пошло не так! Попробуйте ещё раз.'}
+          isOpen={isError}
+          onClose={closeAllPopups}
+        />
+
       </div>
     </CurrentUserContext.Provider>
   );
