@@ -11,7 +11,7 @@ export default function AddPlacePopup({ isOpen, onClose, isSending, onAddPlace }
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    onAddPlace(values, resetForm);
+    onAddPlace(values);
   }
 
   return (

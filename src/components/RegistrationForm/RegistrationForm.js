@@ -1,4 +1,4 @@
-import Form from '../Form/Form';
+import AuthForm from '../AuthForm/AuthForm';
 import { Link } from 'react-router-dom';
 
 
@@ -7,7 +7,7 @@ export default function RegistrationForm({ name, children, isValid, onSubmit }) 
   return (
     <section className="login page__login">
       <h2 className="login__title">{name === 'signup' ? 'Регистрация' : 'Вход'}</h2>
-      <Form
+      <AuthForm
         name={name}
         titleButton={name === 'signup' ? 'Регистрация' : 'Войти'}
         sendingText={name === 'signup' ? 'Регистрация...' : 'Вход...'}

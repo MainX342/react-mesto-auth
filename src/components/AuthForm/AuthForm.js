@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import SendContext from "../../contexts/SendContext";
 
-export default function Form({
+export default function AuthForm({
   name,
   titleButton,
   children,

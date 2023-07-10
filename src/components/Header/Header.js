@@ -1,25 +1,30 @@
 import logo from '../../images/logo.svg'
 import { Link } from 'react-router-dom';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 function Header({ name, dataUser }) {
   const [burger, setBurger] = useState(false)
-  const [count, setCount] = useState(0)
 
   const closeBurgerOnWidth = useCallback(() => {
     if (document.documentElement.clientWidth > '680') {
       setBurger(false)
-      window.removeEventListener('resize', closeBurgerOnWidth)
     }
   }, [])
 
+  useEffect(() => {
+    if (!burger) return;
+    window.addEventListener("resize", closeBurgerOnWidth);
+
+    return () => {
+      window.removeEventListener("resize", closeBurgerOnWidth);
+    };
+  }, [burger]);
+
   function handelClick() {
     if (!burger) {
-      setBurger(true)
-      window.addEventListener('resize', closeBurgerOnWidth)
+      setBurger(true);
     } else {
-      setBurger(false)
-      window.removeEventListener('resize', closeBurgerOnWidth)
+      setBurger(false);
     }
   }
 

@@ -1,10 +1,9 @@
 import useFormValidation from "../../utils/useFormValidation";
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function EditAvatarPopup({ isOpen, onClose, isSending, onUpdateAvatar }) {
   const { values, errors, isInputValid, isValid, handleChange, resetForm } = useFormValidation();
-  const avatarRef = useRef();
 
   useEffect(() => {
     isOpen && resetForm()
@@ -12,7 +11,7 @@ export default function EditAvatarPopup({ isOpen, onClose, isSending, onUpdateAv
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    onUpdateAvatar({ avatar: avatarRef.current.value }, resetForm);
+    onUpdateAvatar({ avatar: values.avatar });
   }
 
   return (
@@ -28,7 +27,6 @@ export default function EditAvatarPopup({ isOpen, onClose, isSending, onUpdateAv
     >
       <div className="popup__field">
         <input
-          ref={avatarRef}
           type="url"
           className={`popup__input popup__input_field_link${isInputValid.avatar === undefined || isInputValid.avatar ? '' : ' popup__input_type_error'}`}
           placeholder="Ссылка на картинку"

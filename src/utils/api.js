@@ -9,79 +9,57 @@ class Api {
     return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
   }
 
+  _request(endpoint, method, body) {
+    const url = `${this._baseUrl}/${endpoint}`;
+
+    const options = {
+      method: method,
+      headers: this._headers,
+    };
+
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
+    return fetch(url, options).then(this._checkResponse);
+  }
+
   async getInfo() {
-    const res = await fetch(`${this._baseUrl}/users/me`, {
-      headers: {
-        authorization: this._authorization
-      }
-    });
-    return this._checkResponse(res);
+    return this._request('users/me', 'GET');
   }
 
   async setUserInfo(data) {
-    const res = await fetch(`${this._baseUrl}/users/me`, {
-      method: 'PATCH',
-      headers: this._headers,
-      body: JSON.stringify({
-        name: data.username,
-        about: data.description,
-      })
+    return this._request('users/me', 'PATCH', {
+      name: data.username,
+      about: data.description,
     });
-    return this._checkResponse(res);
   }
 
   async setUserAvatar(data) {
-    const res = await fetch(`${this._baseUrl}/users/me/avatar`, {
-      method: 'PATCH',
-      headers: this._headers,
-      body: JSON.stringify({
-        avatar: data.avatar,
-      })
+    return this._request('users/me/avatar', 'PATCH', {
+      avatar: data.avatar,
     });
-    return this._checkResponse(res);
   }
 
   async getInitialCards() {
-    const res = await fetch(`${this._baseUrl}/cards`, {
-      headers: {
-        authorization: this._authorization
-      }
-    });
-    return this._checkResponse(res);
+    return this._request('cards', 'GET');
   }
 
   async addNewCardToServer(data) {
-    const res = await fetch(`${this._baseUrl}/cards`, {
-      method: 'POST',
-      headers: this._headers,
-      body: JSON.stringify({
-        name: data.name,
-        link: data.link,
-      })
+    return this._request('cards', 'POST', {
+      name: data.name,
+      link: data.link,
     });
-    return this._checkResponse(res);
   }
 
   async deleteCardFromServer(cardId) {
-    const res = await fetch(`${this._baseUrl}/cards/${cardId}`, {
-      method: 'DELETE',
-      headers: {
-        authorization: this._authorization
-      }
-    });
-    return this._checkResponse(res);
+    return this._request(`cards/${cardId}`, 'DELETE');
   }
 
   async changeLikeCardStatus(cardId, isLiked) {
-    let method= 'DELETE';
-    if (isLiked) {
-      method = 'PUT';
-    }
-    return await fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-      method: method,
-      headers: this._headers
-    })
-    .then(this._checkResponse);
+    const method = isLiked ? 'PUT' : 'DELETE';
+
+    return this._request(`cards/likes/${cardId}`, method);
   }
 }
 

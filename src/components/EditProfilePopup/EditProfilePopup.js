@@ -9,17 +9,13 @@ export default function EditProfilePopup({ isOpen, onClose, isSending, onUpdateU
 
   useEffect(() => {
     if (currentUser.name) {
-      setValue('username', currentUser.name)
-      setValue('description', currentUser.about)
+      resetForm({ username: currentUser.name, description: currentUser.about })
     }
-    else {
-      isOpen && resetForm({ username: currentUser.name, description: currentUser.about })
-    }
-  },[currentUser, setValue, isOpen, resetForm])
+  },[currentUser, isOpen, resetForm])
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    onUpdateUser(values, resetForm);
+    onUpdateUser(values);
   }
 
   return (
