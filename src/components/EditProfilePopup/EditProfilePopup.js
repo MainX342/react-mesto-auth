@@ -4,7 +4,7 @@ import PopupWithForm from "../PopupWithForm/PopupWithForm";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 export default function EditProfilePopup({ isOpen, onClose, isSending, onUpdateUser }) {
-  const { values, errors, isInputValid, isValid, handleChange, resetForm, setValue } = useFormValidation();
+  const { values, errors, isInputValid, isValid, handleChange, resetForm } = useFormValidation();
   const currentUser = useContext(CurrentUserContext)
 
   useEffect(() => {
